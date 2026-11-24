@@ -1,12 +1,20 @@
 substitutions:
-  name: "ascs-raumsensor"
-  friendly_name: "ASCS Raumsensor"
-  device_description: "ASCS Raumsensor motion target tracking and enviroment sensor"
-  project_name: "ascs.raumsensor"
-  project_version: "2026.01.01"
+  name: "ascs-multisensor"
+  friendly_name: "ASCS Multisensor"
+  device_description: "ASCS Multisensor: motion target tracking and enviroment sensor"
+  project_name: "ascs.multisensor"
+  project_version: "2026.11.02"
   update_interval: 60s
 
 esphome:
+  min_version: 2026.08.0
+  includes:
+    - radar/zone_writer.h
+    - radar/web_scope.h
+  on_boot:
+    - priority: 300
+      then:
+        - lambda: ascs_radar::register_editor_routes();
   name: "${name}"
   friendly_name: "${friendly_name}"
   comment: "${device_description}"
@@ -55,6 +63,16 @@ esp32_improv:
   authorizer: none
 
 captive_portal:
+
+web_server:
+  port: 80
+  version: 3
+  local: false
+  js_url: ""
+  css_url: ""
+  js_include: radar/editor.js
+  log: false
+  ota: false
 
 wifi:
   ap:
@@ -149,6 +167,8 @@ number:
       y2:
         id: zone_3_y2_number
         name: "Zone-3 Y2"
+        on_value:
+          - lambda: ascs_radar::zone_writer.saw_readback();
 
 switch:
   - platform: ld2450
@@ -317,3 +337,46 @@ text_sensor:
       direction:
         id: target_3_direction
         name: "Ziel-3 Richtung"
+
+# One request per save. The editor checks the original settings before writing
+# and waits for the LD2450 to report its stored values before showing success.
+text:
+  - platform: template
+    id: ascs_zone_request
+    name: "ASCS Zonenauftrag"
+    entity_category: config
+    disabled_by_default: true
+    mode: text
+    max_length: 180
+    set_action:
+      - lambda: |-
+          ascs_radar::zone_writer.begin(x, millis(),
+            [] { id(ld2450_radar).query_zone_info(); },
+            [](const std::string &reply) { id(ascs_zone_request).publish_state(reply); });
+
+interval:
+  - interval: 100ms
+    then:
+      - lambda: |-
+          if (!ascs_radar::zone_writer.active()) return;
+          auto read = [](ascs_radar::Settings &out) {
+            const auto mode = id(ld2450_zone_type_select).active_index();
+            if (!mode.has_value()) return false;
+            out[0] = *mode;
+            esphome::number::Number *coords[] = {
+              id(zone_1_x1_number), id(zone_1_y1_number), id(zone_1_x2_number), id(zone_1_y2_number),
+              id(zone_2_x1_number), id(zone_2_y1_number), id(zone_2_x2_number), id(zone_2_y2_number),
+              id(zone_3_x1_number), id(zone_3_y1_number), id(zone_3_x2_number), id(zone_3_y2_number)
+            };
+            for (size_t i = 0; i < 12; ++i) {
+              if (!coords[i]->has_state() || !std::isfinite(coords[i]->state)) return false;
+              out[i + 1] = static_cast<int>(coords[i]->state);
+            }
+            return true;
+          };
+          ascs_radar::zone_writer.step(millis(), read,
+            [](const ascs_radar::Settings &v) {
+              id(ld2450_radar).set_radar_zone(v[0], v[1], v[2], v[3], v[4], v[5], v[6],
+                                              v[7], v[8], v[9], v[10], v[11], v[12]);
+            },
+            [](const std::string &reply) { id(ascs_zone_request).publish_state(reply); });
