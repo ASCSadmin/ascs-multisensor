@@ -3,7 +3,7 @@ substitutions:
   friendly_name: "ASCS Multisensor"
   device_description: "ASCS Multisensor: motion target tracking and enviroment sensor"
   project_name: "ascs.multisensor"
-  project_version: "2026.11.02"
+  project_version: "2026.11.03"
   update_interval: 60s
 
 esphome:
