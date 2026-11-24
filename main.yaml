@@ -198,6 +198,14 @@ button:
       id: ld2450_restart_button
       name: "Radar Neustart"
       entity_category: "config"
+  - platform: factory_reset
+    name: Sensor Werkseinstellungen (ACHTUNG!)
+    id: button_factory_reset_1
+    entity_category: diagnostic
+  - platform: restart
+    name: Sensor Neustart
+    id: button_restart_1
+    entity_category: diagnostic
 
 sensor:
   - platform: wifi_signal
