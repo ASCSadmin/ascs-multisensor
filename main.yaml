@@ -60,7 +60,7 @@ http_request:
 
 improv_serial:
 
-improv_ble::
+improv_ble:
   authorizer: none
 
 captive_portal:
