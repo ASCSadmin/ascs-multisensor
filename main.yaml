@@ -3,7 +3,7 @@ substitutions:
   friendly_name: "ASCS Multisensor"
   device_description: "ASCS Multisensor: motion target tracking and enviroment sensor"
   project: 
-    name: "ascs-multisensor"
+    name: "ascs.multisensor"
     version: "2026.11.02"
   update_interval: 60s
 
