@@ -1,15 +1,16 @@
 {
   "name": "ascs-multisensor",
-  "version": "2026.11.02",
+  "version": "2026.11.03",
   "builds": [
     {
       "chipFamily": "ESP32",
       "ota": {
-        "md5": "8df029a20c1c9cc719b2bcbd011a175d",
+        "md5": "881d1de4becf79ef2f0dc8546fef4173",
         "path": "ascs-multisensor-firmware.ota.bin",
-        "release_url": "https://github.com/ASCSadmin/ascs-raumsensor/releases/latest",
-        "summary": "Neue Version 2026.11.02"
+        "release_url": "https://github.com/ASCSadmin/ascs-multisensor/releases/latest",
+        "summary": "Neue Version 2026.11.03"
       }
     }
   ]
 }
+
