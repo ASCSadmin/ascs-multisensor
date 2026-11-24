@@ -59,7 +59,7 @@ http_request:
 
 improv_serial:
 
-improv_ble:
+esp32_improv:
   authorizer: none
 
 captive_portal:
