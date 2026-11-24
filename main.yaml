@@ -77,7 +77,7 @@ web_server:
 
 wifi:
   ap:
-    ssid: "ASCS Raumsensor Setup"
+    ssid: "ASCS Multisensor Setup"
     password: ""
 
 dashboard_import:
